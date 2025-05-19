@@ -1,99 +1,64 @@
 import streamlit as st
-import hashlib
 
-# 🔑 Caesar Cipher Shift Key
-SHIFT = 3
+# Initialize session state for counting users (no file needed)
+if "challenge_count" not in st.session_state:
+    st.session_state.challenge_count = 0
 
-# 🧠 In-memory storage
-stored_data = {}
-if "failed" not in st.session_state:
-    st.session_state.failed = 0
+# --- Title and Header ---
+st.title("🌱 Growth Mindset Challenge")
+st.subheader("Believe in your ability to grow and improve!")
 
-# 🔐 Hash the passkey
-def hash_passkey(passkey):
-    return hashlib.sha256(passkey.encode()).hexdigest()
+# --- What is Growth Mindset ---
+st.markdown("""
+### 💭 What is a Growth Mindset?
 
-# 🔒 Caesar Encrypt
-def caesar_encrypt(text):
-    result = ""
-    for char in text:
-        if char.isalpha():
-            shift = SHIFT if char.islower() else -SHIFT
-            result += chr((ord(char) + shift) % 256)
-        else:
-            result += char
-    return result
+A **growth mindset** means believing that your intelligence and skills can be developed through effort and learning.
+It’s okay to make mistakes. Every mistake helps you grow.
 
-# 🔓 Caesar Decrypt
-def caesar_decrypt(text):
-    result = ""
-    for char in text:
-        if char.isalpha():
-            shift = -SHIFT if char.islower() else SHIFT
-            result += chr((ord(char) + shift) % 256)
-        else:
-            result += char
-    return result
+**Dr. Carol Dweck** shared this idea.
+""")
 
-# 🔍 Check and decrypt
-def decrypt_data(encrypted_text, passkey):
-    correct_pass = hash_passkey(passkey)
-    for saved_text, info in stored_data.items():
-        if saved_text == encrypted_text and info["passkey"] == correct_pass:
-            st.session_state.failed = 0
-            return caesar_decrypt(encrypted_text)
-    st.session_state.failed += 1
-    return None
+# --- Why Adopt It ---
+st.markdown("""
+### 💪 Why Should You Have a Growth Mindset?
 
-# 🖥️ Streamlit App
-st.title("🔒 Simple Secure Data App")
+- ✅ Embrace challenges  
+- ✅ Learn from mistakes  
+- ✅ Keep trying when things are tough  
+- ✅ Celebrate your effort, not just results  
+- ✅ Stay open to feedback  
+""")
 
-menu = ["🏠 Home", "📝 Save Data", "🔍 View Data", "🔑 Login"]
-choice = st.sidebar.selectbox("Choose Page", menu)
+# --- How to Practice It ---
+st.markdown("""
+### 🧠 How Can You Practice a Growth Mindset?
 
-if choice == "🏠 Home":
-    st.write("Welcome! Save and view secret messages using Caesar Cipher.")
+- 🎯 Set learning goals  
+- ✍️ Reflect on your learning  
+- 🗣️ Accept feedback  
+- 😊 Stay positive and keep improving!  
+""")
 
-elif choice == "📝 Save Data":
-    st.subheader("Save Secret Message")
-    text = st.text_area("Enter your secret:")
-    passkey = st.text_input("Create a passkey:", type="password")
+# --- Challenge Section ---
+st.markdown("## 🎉 Ready to Accept the Challenge?")
+accept = st.checkbox("Yes, I accept the Growth Mindset Challenge!")
 
-    if st.button("Encrypt & Save"):
-        if text and passkey:
-            encrypted = caesar_encrypt(text)
-            stored_data[encrypted] = {"passkey": hash_passkey(passkey)}
-            st.success("✅ Data saved successfully!")
-            st.code(encrypted)
-        else:
-            st.warning("⚠️ Fill all fields.")
+if accept:
+    st.success("Awesome! You’re on your way to becoming a better learner! 🚀")
 
-elif choice == "🔍 View Data":
-    st.subheader("Retrieve Secret Message")
-    encrypted_text = st.text_area("Paste encrypted text:")
-    passkey = st.text_input("Enter passkey:", type="password")
+    # Ask for user's goal this week
+    goal = st.text_input("🌟 What will you do this week with a growth mindset?")
 
-    if st.button("Decrypt"):
-        if encrypted_text and passkey:
-            result = decrypt_data(encrypted_text, passkey)
-            if result:
-                st.success("✅ Your Message:")
-                st.code(result)
-            else:
-                st.error(f"❌ Incorrect passkey! Tries left: {3 - st.session_state.failed}")
-                if st.session_state.failed >= 3:
-                    st.warning("🔒 Too many attempts! Go to Login.")
-                    st.experimental_rerun()
-        else:
-            st.warning("⚠️ Fill all fields.")
+    if goal:
+        st.write(f"✅ Great! Your goal: **{goal}**. Keep going! 💪")
 
-elif choice == "🔑 Login":
-    st.subheader("Re-login")
-    master = st.text_input("Enter Master Password:", type="password")
+    # Increment the session-based counter
+    if "submitted" not in st.session_state:
+        st.session_state.challenge_count += 1
+        st.session_state.submitted = True
 
-    if st.button("Login"):
-        if master == "admin123":
-            st.session_state.failed = 0
-            st.success("✅ Logged in! Try again now.")
-        else:
-            st.error("❌ Wrong password!")
+    st.info(f"📈 Total students accepted the challenge (this session): **{st.session_state.challenge_count}**")
+
+# --- Footer ---
+st.markdown("---")
+st.caption("Developed with ❤️ using Streamlit by Muhammad Ibrahim Mubashir")
